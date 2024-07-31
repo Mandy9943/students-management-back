@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import * as studentService from "../services/studentService";
 
 export const getAllStudents = async (req: Request, res: Response) => {
-  const students = await studentService.getAllStudents();
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const students = await studentService.getAllStudents(page, limit);
   res.json(students);
 };
 

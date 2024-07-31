@@ -1,8 +1,31 @@
 import { Students } from "@prisma/client";
 import prisma from "../utils/prismaClient";
 
-export const getAllStudents = async (): Promise<Students[]> => {
-  return prisma.students.findMany();
+export const getAllStudents = async (
+  page: number,
+  limit: number
+): Promise<{
+  students: Students[];
+  totalCount: number;
+  totalPages: number;
+}> => {
+  const skip = (page - 1) * limit;
+
+  const [students, totalCount] = await Promise.all([
+    prisma.students.findMany({
+      skip,
+      take: limit,
+    }),
+    prisma.students.count(),
+  ]);
+
+  const totalPages = Math.ceil(totalCount / limit);
+
+  return {
+    students,
+    totalCount,
+    totalPages,
+  };
 };
 
 export const getStudentById = async (id: number): Promise<Students | null> => {
